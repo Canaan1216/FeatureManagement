@@ -5,15 +5,10 @@ README
 * [特征工程概述](#特征工程概述)
 * [数据预处理](#数据预处理)
     * [无量纲化](#无量纲化)
-        * [标准化](#标准化)
-        * [区间缩放法](#区间缩放法)
-        * [L2归一化](#L2归一化)
     * [定量特征二值化](#定量特征二值化)
     * [定性特征哑变量化](#定性特征哑变量化)
 * [特征选择](#特征选择)
     * [为什么要做特征选择](#为什么要做特征选择)
-        * [特征不足的影响](#特征不足的影响)
-        * [特征冗余的影响](#特征冗余的影响)
     * [filter](#filter)
     * [Wrapper](#Wrapper)
     * [Embedded](#Embedded)
@@ -881,7 +876,7 @@ LDA分类的目标是：使得不同类别之间的距离越远越好，同一�
 
 最终我们可以得到一个下面的公式，表示LDA投影到w后的损失函数(因为我们这里考虑的是二分类LDA，所以只有2个类别项)：
 
-![](https://latex.codecogs.com/svg.latex?J(w)=\frac{|\widetilde{m_1}-\widetilde{m_2}|^2}{\widetilde{s_1}^2+\widetilde{s_2}^2})
+![JW2.png](http://note.youdao.com/yws/public/resource/d2b6e3f8e85746e2afb32c9f2ae46c8e/WEBRESOURCEfbd2f849cf92200237fe250b5cff3c94?ynotemdtimestamp=1602762685249)
 
 分母表示每一个类别内的方差之和，分子表示两个类别中心点之间的距离平方，我们最大化J(w)就可以求出最优的w了。
 
