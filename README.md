@@ -27,7 +27,7 @@ README
 
 在这个例子中，一个非常经典的构造特征是BMI指数：
 
-BMI=体重/身高^2
+> BMI=体重/身高^2
 
 这样，通过BMI指数，就能帮助我们刻画一个人的身材如何。甚至我们可以丢弃原始的体重和身高数据。
 
@@ -73,7 +73,7 @@ BMI=体重/身高^2
 
 定量特征二值化的核心在于设定一个阈值，大于阈值的赋值为1，小于等于阈值的赋值为0，公式表达如下：
 
-![](https://latex.codecogs.com/svg.latex?x%27=\left\{\begin{matrix}1,x%3Ethreshold\\%200,x\leq%20threshold\end{matrix}\right.)
+![定量特征二值化.jpg](http://note.youdao.com/yws/public/resource/d2b6e3f8e85746e2afb32c9f2ae46c8e/WEBRESOURCE64669e82f2960e5876c8c78c57397041?ynotemdtimestamp=1602752731323)
 
 ### 定性特征哑编码化
 
@@ -124,7 +124,7 @@ BMI=体重/身高^2
 
 使用相关系数法，先要计算各个特征对目标值的相关系数以及相关系数的P值。皮尔森(Pearson)相关系数公式：两个连续变量(X,Y)的pearson相关系数P<sub>X,Y</sub>等于它们之间的协方差cov(X,Y)除以它们各自标准差的乘积。
 
-![](https://latex.codecogs.com/svg.latex?p_{X,Y}=\frac{cov(X,Y)}{\sigma_X\sigma_Y}=\frac{E((X-\mu_X)(Y-\mu_Y))}{\sigma_X\sigma_Y}=\frac{E((X-\mu_X)(Y-\mu_Y))}{\sqrt{E(X^2)-E^2(X)}\sqrt{E(Y^2)-E^2(Y)}})
+![皮尔森.jpg](http://note.youdao.com/yws/public/resource/d2b6e3f8e85746e2afb32c9f2ae46c8e/WEBRESOURCEf0afca5a6f8bf601b6fe416504fe830b?ynotemdtimestamp=1602752731323)
 
 
 #### 卡方检验
@@ -225,7 +225,7 @@ Linear model: 0.984 * X0 + 1.995 * X1 + -0.041 * X2
 
 比如，我们有一个数据集，其真实模型形式为：Y=X<sub>1</sub>+X<sub>2</sub>，然后我们观测的数据为(ϵ为噪音)：
 
-![](https://latex.codecogs.com/svg.latex?\hat{Y}=X_1+X_2+\epsilon)
+![我们的观测数据.jpg](http://note.youdao.com/yws/public/resource/d2b6e3f8e85746e2afb32c9f2ae46c8e/WEBRESOURCE144130a89ebc9bca123f32d44b619af2?ynotemdtimestamp=1602752731323)
 
 我们假设X<sub>1</sub>与X<sub>2</sub>存在相关关系，比如X<sub>1</sub>≈X<sub>2</sub>。取决于ϵ的大小，我们得到的模型的结果可能是：
 - Y=2X<sub>1</sub>
@@ -280,7 +280,7 @@ L0是指向量中非0的元素的个数。如果我们用L0范数来规则化一
 
 L1正则化会添加如下惩罚项到损失函数中：
 
-![](https://latex.codecogs.com/svg.latex?\alpha\sum_{i=1}^{n}|w_i|)
+![L1惩罚项.jpg](http://note.youdao.com/yws/public/resource/d2b6e3f8e85746e2afb32c9f2ae46c8e/WEBRESOURCE5a7f903ffa018817ec3203529c0c148f?ynotemdtimestamp=1602752731323)
 
 由于每个非零的系数都会加总到惩罚项中，上式会倾向于将比较弱的特征的系数置为0。因此L1正则化会产生稀疏权值矩阵，也就起到了特征筛选的作用。
 
@@ -811,9 +811,7 @@ LDA的全称是Linear Discriminant Analysis(线性判别分析)，是一种super
 
 ![lda投影demo.gif](http://note.youdao.com/yws/public/resource/a69eeab234449e2b06866beedcf87e25/WEBRESOURCE0b1fdf580abe09b153b24865496a66ae?ynotemdtimestamp=1602750323502)
 
-下面我们来推导一下二分类LDA问题的公式。假设用来区分二分类的直线(投影函数)为：
-
-![](https://latex.codecogs.com/svg.latex?y=w^Tx)
+下面我们来推导一下二分类LDA问题的公式。假设用来区分二分类的直线(投影函数)为：y=w<sup>T</sup>x
 
 LDA分类的目标是：使得不同类别之间的距离越远越好，同一类别之中的距离越近越好(投影后类内方差最小，类间方差最大)。
 
@@ -861,7 +859,9 @@ LDA分类的目标是：使得不同类别之间的距离越远越好，同一�
 
 因为如果分子、分母都可以取任意值的话，会使得解的个数有无穷多个，因此我们将分母限制为长度为1(拉格朗日乘子法技巧)，并作为拉格朗日乘子法的限制条件，带入得到：
 
-![](https://latex.codecogs.com/svg.latex?c(w)=w^TS_Bw-\lambda(w^TS_ww-1)\\\Rightarrow%20\frac{dc}{dw}=2S_Bw-2\lambda%20S_ww=0\Rightarrow%20S_Bw=\lambda%20S_ww)
+![](https://latex.codecogs.com/svg.latex?c(w)=w^TS_Bw-\lambda(w^TS_ww-1))
+
+![](https://latex.codecogs.com/svg.latex?\frac{dc}{dw}=2S_Bw-2\lambda%20S_ww=0\Rightarrow%20S_Bw=\lambda%20S_ww)
 
 如此，便转化为一个求特征值的问题。第i大的特征值，便对应w<sub>i</sub>。
 
