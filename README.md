@@ -1,6 +1,46 @@
-[toc]
+README
 
-## <font color=red>**特征工程概述**</font>
+## 目录
+
+* [特征工程概述](#特征工程概述)
+* [数据预处理](#数据预处理)
+    * [无量纲化](#无量纲化)
+        * [标准化](#标准化)
+        * [区间缩放法](#区间缩放法)
+        * [L2归一化](#L2归一化)
+    * [定量特征二值化](#定量特征二值化)
+    * [定性特征哑变量化](#定性特征哑变量化)
+* [特征选择](#特征选择)
+    * [为什么要做特征选择](#为什么要做特征选择)
+        *[特征不足的影响](#特征不足的影响)
+        *[特征冗余的影响](#特征冗余的影响)
+    * [filter](#filter)
+        *[方差选择法](#方差选择法)
+        *[相关系数法](#相关系数法)
+        *[卡方检验](#卡方检验)
+        *[互信息法(MIC)](#互信息法(MIC))
+    * [Wrapper](#Wrapper)
+        *[stability selection](#stability selection)
+        *[recursive feature elimination(RFE)](#recursive feature elimination(RFE))
+    * [Embedded](#Embedded)
+        *[Coefficients as Feature Importance](#Coefficients as Feature Importance)
+            *[Linear Regression Feature Importance](#Linear Regression Feature Importance)
+            *[Regularized models](#Regularized models)
+                *[L0范数](#L0范数)
+                *[L1 regularization/Lasso](#L1 regularization/Lasso)
+                *[L2 regularization/Ridge regression](#L2 regularization/Ridge regression)
+            *[Logistic Regression Feature Importance](#Logistic Regression Feature Importance)
+        *[Decision Tree Feature Importance](#Decision Tree Feature Importance)
+            *[CART Feature Importance](#CART Feature Importance)
+            *[Random Forest Feature Importance](#Random Forest Feature Importance)
+            *[XGBoost Feature Importance](#XGBoost Feature Importance)
+    * [相关方法总结](#相关方法总结)
+* [特征降维](#特征降维)
+    *[LDA](#LDA)
+    *[PCA](#PCA)
+
+
+## 特征工程概述
 
 假设现在我们有如下数据：
 > 用户id，身高(height)，体重(weight)
@@ -9,29 +49,29 @@
 
 在这个例子中，一个非常经典的构造特征是BMI指数：
 
-![](https://latex.codecogs.com/svg.latex?BMI%20=%20\frac{weight}{height^2})
+![](https://latex.codecogs.com/svg.latex?BMI=\frac{weight}{height^2})
 
 这样，通过BMI指数，就能帮助我们刻画一个人的身材如何。甚至我们可以丢弃原始的体重和身高数据。
 
 特征工程，就是基于原有的维度特征X，创造新的特征X'。 基本的操作包括：衍生(升维)、筛选(降维)。
 
-![特征工程概览.jpg](https://github.com/Canaan1216/FeatureManagement/image/pic1.png)
+![特征工程概览.jpg](https://github.com/Canaan1216/FeatureManagement/blob/main/image/pic1.png)
 
 通过总结和归纳，通常认为特征工程包括以下方面：
 
-![特征工程组成部分.jpg](https://github.com/Canaan1216/FeatureManagement/image/fm_component.jpg)
+![特征工程组成部分.jpg](https://github.com/Canaan1216/FeatureManagement/blob/main/image/fm_component.jpg)
 
 其中特征处理是特征工程的核心部分。
 
-## <font color=red>**数据预处理**</font>
+## 数据预处理
 
 通过特征提取，我们能得到未经处理的特征，这时的特征可能有以下问题：
-- **不属于同一量纲：** 即特征的规格不一样，不能够放在一起比较。无量纲化可以解决这一问题。
-- **信息冗余：** 对于某些定量特征，其包含的有效信息为区间划分，例如学习成绩，假若只关心“及格”或不“及格”，那么需要将定量的考分，转换成“1”和“0”表示及格和未及格。二值化可以解决这一问题。
-- **定性特征不能直接使用：** 某些机器学习算法和模型只能接受定量特征的输入，那么需要将定性特征转换为定量特征。最简单的方式是为每一种定性值(枚兴值)指定一个定量值，但是这种方式过于灵活，增加了调参的工作。<br>通常使用哑编码的方式将定性特征转换为定量特征：假设有N种定性值，则将这一个特征扩展为N种特征，当原始特征值为第i种定性值时，第i个扩展特征赋值为1，其他扩展特征赋值为0。<br>哑编码的方式相比直接指定的方式，不用增加调参的工作，对于线性模型来说，使用哑编码后的特征可达到非线性的效果。
-- **存在缺失值：** 缺失值需要补充。
+- 不属于同一量纲： 即特征的规格不一样，不能够放在一起比较。无量纲化可以解决这一问题。
+- 信息冗余： 对于某些定量特征，其包含的有效信息为区间划分，例如学习成绩，假若只关心“及格”或不“及格”，那么需要将定量的考分，转换成“1”和“0”表示及格和未及格。二值化可以解决这一问题。
+- 定性特征不能直接使用： 某些机器学习算法和模型只能接受定量特征的输入，那么需要将定性特征转换为定量特征。最简单的方式是为每一种定性值(枚兴值)指定一个定量值，但是这种方式过于灵活，增加了调参的工作。<br>通常使用哑编码的方式将定性特征转换为定量特征：假设有N种定性值，则将这一个特征扩展为N种特征，当原始特征值为第i种定性值时，第i个扩展特征赋值为1，其他扩展特征赋值为0。<br>哑编码的方式相比直接指定的方式，不用增加调参的工作，对于线性模型来说，使用哑编码后的特征可达到非线性的效果。
+- 存在缺失值： 缺失值需要补充。
 
-### <font color=purple>无量纲化</font>
+### 无量纲化
 
 常见的无量纲化方法有标准化和区间缩放法。标准化的前提是特征值服从正态分布，标准化后，其转换成标准正态分布。区间缩放法利用了边界值信息，将特征的取值区间缩放到某个特点的范围，例如[0, 1]等。
 
@@ -51,46 +91,46 @@
 
 #### L2归一化
 
-![](https://latex.codecogs.com/svg.latex?x%27=\frac{x}{\sqrt{\sum_j^m%20x_j^2}})
+![](https://latex.codecogs.com/svg.latex?x%27=\frac{x}{\sqrt{\sum_j^mx_j^2}})
 
-### <font color=purple>定量特征二值化</font>
+### 定量特征二值化
 
 定量特征二值化的核心在于设定一个阈值，大于阈值的赋值为1，小于等于阈值的赋值为0，公式表达如下：
 
-![](https://latex.codecogs.com/svg.latex?x%27=\left\{\begin{matrix}1,\;x%3Ethreshold\\%200,\;x%20\leq%20threshold\end{matrix}\right.)
+![](https://latex.codecogs.com/svg.latex?x%27=\left\{\begin{matrix}1,\;x%3Ethreshold\\0,\;x\leqthreshold\end{matrix}\right.)
 
-### <font color=purple>对定性特征哑编码</font>
+### 定性特征哑编码化
 
 例：对于province这一个字段，它共有34种可能的枚举取值："北京市"、"广东省"、"山东首"、...<br>
 
 我们可以将其dummy化，转为"是否北京市"、"是否广东省"、"是否山东省"等34个字段。
 
-## <font color=red>**特征选择**</font>
+## 特征选择
 
 当数据预处理完成后，我们需要选择有意义的特征输入机器学习的算法和模型进行训练。
 
-### <font color=purple>为什么要做特征选择</font>
+### 为什么要做特征选择
 
 一般说来，当固定一个分类器的话，所选择的特征数量和分类器的效果之间会满足如下曲线：特征数据在等于某个x(1≤x≤n)时达到最优。过多或过少都会使分类器的效果发生下降。
 
-![特征数量与模型效果的关系.jpeg](https://github.com/Canaan1216/FeatureManagement/image/feature_cnt_result.jpeg)
+![特征数量与模型效果的关系.jpeg](https://github.com/Canaan1216/FeatureManagement/blob/main/image/feature_cnt_result.jpeg)
 
 #### 特征不足的影响
 
-当特征不足时，极易发生数据重叠，这种情况下任何分类器都会失效。如下图所示，仅依赖X<sub>1</sub>或X~2~都是无法区分这两类数据的。
+当特征不足时，极易发生数据重叠，这种情况下任何分类器都会失效。如下图所示，仅依赖X<sub>1</sub>或X<sub>2</sub>都是无法区分这两类数据的。
 
-![特征过少.png](https://github.com/Canaan1216/FeatureManagement/image/too_little_features.png)
+![特征过少.png](https://github.com/Canaan1216/FeatureManagement/blob/main/image/too_little_features.png)
 
 #### 特征冗余的影响
 
 增加特征可以理解为向高维空间映射，当这个“维度”过高时，容易造成同类数据在空间中的距离边远，变稀疏，这也易使得很多分类算法失效。如下图所示，仅依赖x轴本可划分特征，但y轴的引入使得同一类别不再聚集。
 
-![特征过多.png](https://github.com/Canaan1216/FeatureManagement/image/too_much_features.png)
+![特征过多.png](https://github.com/Canaan1216/FeatureManagement/blob/main/image/too_much_features.png)
 
 
 通常来说，我们从两个方面考虑来选择特征：
-- **特征是否发散：** 如果一个特征不发散，例如方差接近于0，也就是说样本在这个特征上基本上没有差异，这个特征对于样本的区分并没有什么用；
-- **特征与目标的相关性：** 与目标相关性高的特征，应当优选选择；
+- 特征是否发散： 如果一个特征不发散，例如方差接近于0，也就是说样本在这个特征上基本上没有差异，这个特征对于样本的区分并没有什么用；
+- 特征与目标的相关性： 与目标相关性高的特征，应当优选选择；
 
 根据特征选择的形式又可以将特征选择方法分为3种(经典三刀)：
 
@@ -98,7 +138,7 @@
 - Wrapper：包装法，根据目标函数(通常是预测效果评分)，每次选择若干特征，或者排除若干特征；
 - Embedded：集成法，学习器自身自动选择特征。先使用某些机器学习的算法和模型进行训练，得到各个特征的权值系数，根据系数从大到小选择特征。类似于Filter方法，但是是通过训练来确定特征的优劣；
 
-### <font color=purple>filter</font>
+### filter
 
 #### 方差选择法
 
@@ -106,16 +146,16 @@
 
 #### 相关系数法
 
-使用相关系数法，先要计算各个特征对目标值的相关系数以及相关系数的P值。皮尔森(Pearson)相关系数公式：两个连续变量(X,Y)的pearson相关系数P~X,Y~等于它们之间的协方差cov(X,Y)除以它们各自标准差的乘积。
+使用相关系数法，先要计算各个特征对目标值的相关系数以及相关系数的P值。皮尔森(Pearson)相关系数公式：两个连续变量(X,Y)的pearson相关系数P<sub>X,Y</sub>等于它们之间的协方差cov(X,Y)除以它们各自标准差的乘积。
 
-![](https://latex.codecogs.com/svg.latex?p_{X,Y}=\frac{cov(X,Y)}{\sigma_X%20\sigma_Y}=\frac{E((X-\mu_X)(Y-\mu_Y))}{\sigma_X%20\sigma_Y}=\frac{E((X-\mu_X)(Y-\mu_Y))}{\sqrt{E(X^2)-E^2(X)}\sqrt{E(Y^2)-E^2(Y)}})
+![](https://latex.codecogs.com/svg.latex?p_{X,Y}=\frac{cov(X,Y)}{\sigma_X\sigma_Y}=\frac{E((X-\mu_X)(Y-\mu_Y))}{\sigma_X\sigma_Y}=\frac{E((X-\mu_X)(Y-\mu_Y))}{\sqrt{E(X^2)-E^2(X)}\sqrt{E(Y^2)-E^2(Y)}})
 
 
 #### 卡方检验
 
 经典的卡方检验是检验定性自变量对定性因变量的相关性。假设自变量有N种取值，因变量有M种取值，考虑自变量等于i且因变量等于j的样本频数的观察值与期望的差距，构建统计量：
 
-![](https://latex.codecogs.com/svg.latex?\chi%20^2%20=%20\sum%20\frac{(A-E)^2}{E})
+![](https://latex.codecogs.com/svg.latex?\chi^2=\sum\frac{(A-E)^2}{E})
 
 不难发现，[这个统计量的含义简而言之就是自变量对因变量的相关性](https://wiki.mbalib.com/wiki/%E5%8D%A1%E6%96%B9%E6%A3%80%E9%AA%8C)。
 
@@ -123,11 +163,11 @@
 
 全称为：Mutual information and maximal information coefficient。经典的互信息也是评价定性自变量对定性因变量的相关性的，互信息计算公式如下：
 
-![](https://latex.codecogs.com/svg.latex?I(X;Y)=\sum_{x%20\in%20X}\sum_{y%20\in%20Y}{p(x,y)log\frac{p(x,y)}{p(x)p(y)}})
+![](https://latex.codecogs.com/svg.latex?I(X;Y)=\sum_{x\inX}\sum_{y\inY}{p(x,y)log\frac{p(x,y)}{p(x)p(y)}})
 
 为了处理定量数据，最大信息系数法被提出。<br>
 
-### <font color=purple>Wrapper</font>
+### Wrapper
 
 #### stability selection
 稳定性选择法，是对基于L1正则方法的一种补充。基于L1正则方法的局限性在于：当面对一组关联的特征时，它往往只会选择其中的一项特征。为了减轻该影响，使用了随机化的技术，通过多次重新估计稀疏模型，用==特征被选择为重要的次数/总次数==来表征该特征最终的重要程度。
@@ -142,7 +182,7 @@ RFE的稳定性很大程度上取决于迭代时，底层用的哪种模型。�
 RFECV通过交叉验证的方式执行RFE，以此来选择最佳数量的特征：对于一个数量为d的feature的集合，他的所有的子集的个数是2的d次方减1(包含空集)。指定一个外部的学习算法(比如SVM)，通过该算法计算所有子集的validation error。选择error最小的那个子集作为所挑选的特征。
 
 
-### <font color=purple>Embedded</font>
+### Embedded
 
 feature importance有两种常用实现思路：
 
@@ -167,7 +207,7 @@ sklearn中实现的是第一种方法。
 ##### Linear Regression Feature Importance
 线性回归模型算法得到的结果公式，是各特征的加权和。这些权重系数，可以直接当做一种特征重要性分数。
 
-> **[coef_](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html)：** array of shape (n_features) or (n_targets, n_features)
+> [coef_](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html)： array of shape (n_features) or (n_targets, n_features)
 
 Estimated coefficients for the linear regression problem. If multiple targets are passed during the fit (y 2D), this is a 2D array of shape (n_targets, n_features), while if only one target is passed, this is a 1D array of length n_features.
 
@@ -207,11 +247,11 @@ Linear model: 0.984 * X0 + 1.995 * X1 + -0.041 * X2
 
 如果一个数据集中，特征与特征之间存在相互关联，那模型将变得不稳定。非常小的数据扰动就会导致模型的很大变化，使得解释模型变得困难。
 
-比如，我们有一个数据集，其真实模型形式为：Y=X<sub>1</sub>+X~2~，然后我们观测的数据为(ϵ为噪音)：
+比如，我们有一个数据集，其真实模型形式为：Y=X<sub>1</sub>+X<sub>2</sub>，然后我们观测的数据为(ϵ为噪音)：
 
-![](https://latex.codecogs.com/svg.latex?\hat{Y}=X_1%20+%20X_2%20+%20\epsilon)
+![](https://latex.codecogs.com/svg.latex?\hat{Y}=X_1+X_2+\epsilon)
 
-我们假设X<sub>1</sub>与X<sub>2</sub>存在相关关系，比如X<sub>1</sub>~≈X<sub>2</sub>。取决于ϵ的大小，我们得到的模型的结果可能是：
+我们假设X<sub>1</sub>与X<sub>2</sub>存在相关关系，比如X<sub>1</sub>≈X<sub>2</sub>。取决于ϵ的大小，我们得到的模型的结果可能是：
 - Y=2X<sub>1</sub>
 - Y=-X<sub>1</sub>+3X<sub>2</sub>
 - ...
@@ -254,31 +294,31 @@ Linear model: -1.291 * X0 + 1.591 * X1 + 2.747 * X2
 > Q2：参数值越小代表模型越简单吗?<br><br>
 是的。因为越复杂的模型，越是会尝试对所有的样本进行拟合，甚至包括一些异常样本点，这就容易造成在较小的区间里预测值产生较大的波动，这种较大的波动也反映了在这个区间里的导数很大，而只有较大的参数值才能产生较大的导数。因此复杂的模型，其参数值会比较大。
 
-###### <font color=blue>L0范数</font>
+###### L0范数
 
 L0是指向量中非0的元素的个数。如果我们用L0范数来规则化一个参数矩阵W的话，就是希望W的大部分元素都是0。换句话说，让参数W是稀疏的。
 
 但不幸的是，L0范数的最优化问题是一个NP hard问题，而且理论上有证明，L1范数是L0范数的最优凸近似，因此通常使用L1范数来代替。
 
-###### <font color=blue>L1 regularization/Lasso</font>
+###### L1 regularization/Lasso
 
 L1正则化会添加如下惩罚项到损失函数中：
 
-![](https://latex.codecogs.com/svg.latex?\alpha%20\sum_{i=1}^{n}|w_i|)
+![](https://latex.codecogs.com/svg.latex?\alpha\sum_{i=1}^{n}|w_i|)
 
 由于每个非零的系数都会加总到惩罚项中，上式会倾向于将比较弱的特征的系数置为0。因此L1正则化会产生稀疏权值矩阵，也就起到了特征筛选的作用。
 
-###### <font color=blue>L2 regularization/Ridge regression</font>
+###### L2 regularization/Ridge regression
 
 L2正则化会添加如下惩罚项到损失函数中：
 
-![](https://latex.codecogs.com/svg.latex?\alpha%20\sum_{i=1}^{n}w_i^2)
+![](https://latex.codecogs.com/svg.latex?\alpha\sum_{i=1}^{n}w_i^2)
 
 L2正则化倾向于使系数值平均分散。对于存在相关关系的特征，它们会得到相近的值。
 
 对于上面的例子，假如我们有两个相似的目标函数：
-- Y=1*X<sub>1<\sub>+1*X<sub>2<\sub>
-- Y=2*X<sub>1<\sub>+0*X<sub>2<\sub>
+- Y=1X<sub>1<\sub>+1X<sub>2<\sub>
+- Y=2X<sub>1<\sub>+0X<sub>2<\sub>
 
 如果用L1正则化，则惩罚项都是2α。但如果用L2正则化，则第一个模型的惩罚项是2α，第二个模型的惩罚项是4α。
 
@@ -368,10 +408,13 @@ Ridge model: 0.896 * X0 + 0.903 * X1 + 0.98 * X2
 > Q：为什么L1范数倾向于使特征系数变稀疏，而L2范数倾向于使特征系数变平滑?
 
 
-**数学公式角度解释：**
+数学公式角度解释：
 
-![](https://latex.codecogs.com/svg.latex?L1=|w_1|+|w_1|+...+|w_n|,\frac{\partial%20L_1}{\partial%20w_i}=sign(w_i)=1\;or\;-1)
-![](https://latex.codecogs.com/svg.latex?L2=\frac{1}{2}(w_1^2%20+%20w_2^2%20+...+%20w_n^2),\frac{\partial%20L_2}{\partial%20w_i}=w_i)
+![](https://latex.codecogs.com/svg.latex?L1=|w_1|+|w_1|+...+|w_n|,\frac{\partialL_1}{\partialw_i}=sign(w_i)=1\;or\;-1)
+
+<br>
+
+![](https://latex.codecogs.com/svg.latex?L2=\frac{1}{2}(w_1^2+w_2^2+...+w_n^2),\frac{\partialL_2}{\partialw_i}=w_i)
 
 我们假设学习速率η为0.5：
 - L1的权值更新公式，每次更新都固定减少一个特定值，那么经过若干次迭代之后，权值就有可能减少到0；
@@ -380,9 +423,9 @@ Ridge model: 0.896 * X0 + 0.903 * X1 + 0.98 * X2
 
 ##### Logistic Regression Feature Importance
 
-我们也可以拟合一个逻辑回归模型([LR](http://note.youdao.com/s/6DZHuoN5))，使用相关系数作为特征重要系数(也即w~i~)。
+我们也可以拟合一个逻辑回归模型([LR](http://note.youdao.com/s/6DZHuoN5))，使用相关系数作为特征重要系数(也即w<sub>i</sub>)。
 
-> **[coef_](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html)：** ndarray of shape (1, n_features) or (n_classes, n_features)<br>
+> [coef_](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html)： ndarray of shape (1, n_features) or (n_classes, n_features)<br>
 Coefficient of the features in the decision function.
 
 coef_ is of shape (1, n_features) when the given problem is binary. In particular, when multi_class='multinomial', coef_ corresponds to outcome 1 (True) and -coef_ corresponds to outcome 0 (False).
@@ -408,7 +451,7 @@ pyplot.bar([x for x in range(len(importance))], importance)
 pyplot.show()
 ```
 
-![logistic_regression_fi.png](https://github.com/Canaan1216/FeatureManagement/image/Linear_Regression_FI.png)
+![logistic_regression_fi.png](https://github.com/Canaan1216/FeatureManagement/blob/main/image/Linear_Regression_FI.png)
 
 #### Decision Tree Feature Importance
 
@@ -422,9 +465,9 @@ After being fit, the model provides a feature_importances_ property that can be 
 
 ##### Random Forest Feature Importance
 
-**Random Forest回归模型特征重要度**
+Random Forest回归模型特征重要度
 
-> **[feature_importances_](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html)：** ndarray of shape (n_features)<br>
+> [feature_importances_](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html)： ndarray of shape (n_features)<br>
 The values of this array sum to 1, unless all trees are single node trees consisting of only the root node, in which case it will be an array of zeros.
 
 The higher, the more important the feature. The importance of a feature is computed as the (normalized) total reduction of the criterion brought by that feature. It is also known as the Gini importance.
@@ -450,11 +493,11 @@ pyplot.bar([x for x in range(len(importance))], importance)
 pyplot.show()
 ```
 
-![rf_regression_fi.png](https://github.com/Canaan1216/FeatureManagement/image/RF_Regression_FI.png)
+![rf_regression_fi.png](https://github.com/Canaan1216/FeatureManagement/blob/main/image/RF_Regression_FI.png)
 
-**Random Forest分类模型特征重要度**
+Random Forest分类模型特征重要度
 
-> **[feature_importances_](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html)：** ndarray of shape (n_features)<br>
+> [feature_importances_](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html)： ndarray of shape (n_features)<br>
 The values of this array sum to 1, unless all trees are single node trees consisting of only the root node, in which case it will be an array of zeros.
 
 The higher, the more important the feature. The importance of a feature is computed as the (normalized) total reduction of the criterion brought by that feature. It is also known as the Gini importance.
@@ -479,9 +522,9 @@ for i,v in enumerate(importance):
 pyplot.bar([x for x in range(len(importance))], importance)
 pyplot.show()
 ```
-![rf_classification_fi.png](https://github.com/Canaan1216/FeatureManagement/image/RF_Classification_FI.png)
+![rf_classification_fi.png](https://github.com/Canaan1216/FeatureManagement/blob/main/image/RF_Classification_FI.png)
 
-**==More examples：==**
+==More examples：==
 
 1、Mean decrease impurity
 
@@ -545,7 +588,7 @@ Features sorted by their score:
 [(0.4283, 'LSTAT'), (0.3527, 'RM'), (0.0722, 'DIS'), (0.0432, 'CRIM'), (0.0243, 'PTRATIO'), (0.0207, 'NOX'), (0.017, 'AGE'), (0.0158, 'TAX'), (0.0112, 'B'), (0.0073, 'INDUS'), (0.0062, 'RAD'), (0.0006, 'ZN'), (0.0005, 'CHAS')]
 ```
 
-**2、Mean decrease accuracy**
+2、Mean decrease accuracy
 
 ```python
 from sklearn.cross_validation import ShuffleSplit
@@ -593,7 +636,7 @@ Features sorted by their score:
 
 This model provides a feature_importances_ property that can be accessed to retrieve the relative importance scores for each input feature.
 
-**XGBoost Regression Feature Importance**
+XGBoost Regression Feature Importance
 
 ```
 # xgboost for feature importance on a regression problem
@@ -616,7 +659,7 @@ pyplot.bar([x for x in range(len(importance))], importance)
 pyplot.show()
 ```
 
-**XGBoost Classification Feature Importance**
+XGBoost Classification Feature Importance
 
 ```
 # xgboost for feature importance on a classification problem
@@ -639,11 +682,11 @@ pyplot.bar([x for x in range(len(importance))], importance)
 pyplot.show()
 ```
 
-### <font color=purple>相关方法总结</font>
+### 相关方法总结
 
 下面我们在同一个数据集上运行所有特征重要度评估方法，以比较各方法之间的异同。数据集来自[Friedman regression dataset](ftp://ftp.uic.edu/pub/depts/econ/hhstokes/e538/Friedman_mars_1991.pdf)，数据符合如下分布：
 
-![](https://latex.codecogs.com/svg.latex?y=10sin(\pi%20x_1%20x_2)+20(x_3%20-0.5)^2%20+10x_4%20+5X_5%20+\epsilon)
+![](https://latex.codecogs.com/svg.latex?y=10sin(\pix_1x_2)+20(x_3-0.5)^2+10x_4+5X_5+\epsilon)
 
 其中，x<sub>1</sub>到x<sub>5</sub>符合[0,1)均匀分布，ϵ是符合N(0,1)分布的标准正态偏差。与此同时，x<sub>6</sub>至x<sub>10</sub>是噪声变量，且与目标变量相互独立。
 
@@ -665,7 +708,7 @@ size = 750
 X = np.random.uniform(0, 1, (size, 14))
 # 生成750*14个[0，1)之间的随机数
 
-Y = (10 * np.sin(np.pi * X[:, 0] * X[:, 1]) + 20 * (X[:, 2] - .5) ** 2 +
+Y = (10 * np.sin(np.pi * X[:, 0] * X[:, 1]) + 20 * (X[:, 2] - .5)  2 +
      10 * X[:, 3] + 5 * X[:, 4] + np.random.normal(0, 1))
 # Add 3 additional correlated variables (correlated with X1-X3)
 X[:, 10:] = X[:, :4] + np.random.normal(0, .025, (size, 4))
@@ -749,134 +792,120 @@ x12 | 0.44 | 0.14 | 0 | 0.71 | 0.12 | 0.67 | 0.68 | 0.42 | 0.4
 x13 | 0 | 0.48 | 0 | 0.23 | 0.01 | 0.89 | 0.02 | 0 | 0.2
 x14 | 0.99 | 0 | 0.16 | ==1== | ==1== | 0.22 | 0.95 | 0.53 | 0.61
 
-**Linear correlation：**
+Linear correlation：
 - 由于每个feature都是单独评估的，所以x<sub>1</sub>、...、x<sub>4</sub>与x<sub>11</sub>、...、x<sub>14</sub>的分值是接近的；
 - 因为噪音向量x<sub>5</sub>、...、x<sub>10</sub>与目标变量之间几乎不存在关联，所以它们的重要性系数都很小；
 - 由于x<sub>3</sub>与目标变量之间是二次平方关系，而线性相关模型无法学习到这种关系，所以x<sub>3</sub>的重要性系数是0；
 
-**Lasso：**
+Lasso：
 - 会将头部重要特征取出，而将其它特征的系数置为0；
-- 在减少特征数量上，lasso无疑是有效的，但在数据可解释性上偏差(可能会误导我们x<sub>11</sub>、x~12~、x~13~是不重要的)；
+- 在减少特征数量上，lasso无疑是有效的，但在数据可解释性上偏差(可能会误导我们x<sub>11</sub>、x<sub>12</sub>、x<sub>13</sub>是不重要的)；
 
-**MIC：**
+MIC：
 - 与相关系数法比较类似的是，MIC也会对所有feature"公平对待"；
 - 此外，MIC能够找到x<sub>3</sub>与目标向量之间的非线性关系；
 
-**RF：**
-- 随机森林基于不纯度的排序方法，在头部几个feature之后，在特征重要度分数上会有一个"锐减"。从结果上看，第三大特征(x~2~，0.24)的分值，已经小于top1(x<sub>14</sub>)的4分之一了；
+RF：
+- 随机森林基于不纯度的排序方法，在头部几个feature之后，在特征重要度分数上会有一个"锐减"。从结果上看，第三大特征(x<sub>2</sub>，0.24)的分值，已经小于top1(x<sub>14</sub>)的4分之一了；
 
-**Ridge regression：**
+Ridge regression：
 - 此方法会使各feature的权重相对均匀地分布，可见x<sub>11</sub>、...、x<sub>14</sub>与x<sub>1</sub>、...、x<sub>4</sub>的分值是接近的；
 
-**Stability selection：**
-- 这种方法能够兼顾数据可解释性与top特征提取。从示例中可以看到，它很好地识别了top头部特征(x<sub>1</sub>，x~2~，x<sub>4</sub>，x<sub>5</sub>)，同时它们的相关特征也得到了一个相对较高的分值；
+Stability selection：
+- 这种方法能够兼顾数据可解释性与top特征提取。从示例中可以看到，它很好地识别了top头部特征(x<sub>1</sub>，x<sub>2</sub>，x<sub>4</sub>，x<sub>5</sub>)，同时它们的相关特征也得到了一个相对较高的分值；
 
-## <font color=red>**特征降维**</font>
+## 特征降维
 
 当特征选择完成后，可以直接训练模型了，但是可能由于特征矩阵过大，导致计算量大，训练时间长的问题，因此降低特征矩阵维度也是必不可少的。
 
 常见的降维方法除了基于L1惩罚项的模型以外，另外还有主成分分析法(PCA)和线性判别分析(LDA)，线性判别分析本身也是一个分类模型。
 
-PCA和LDA有很多的相似点，其本质是要将原始的样本映射到维度更低的样本空间中，但是PCA和LDA的映射目标不一样：==PCA是为了让映射后的样本具有最大的发散性；而LDA是为了让映射后的样本有最好的分类性能==。所以说<font color=purple>**PCA是一种无监督的降维方法，而LDA是一种有监督的降维方法**</font>。
+PCA和LDA有很多的相似点，其本质是要将原始的样本映射到维度更低的样本空间中，但是PCA和LDA的映射目标不一样：==PCA是为了让映射后的样本具有最大的发散性；而LDA是为了让映射后的样本有最好的分类性能==。所以说PCA是一种无监督的降维方法，而LDA是一种有监督的降维方法。
 
 
-### <font color=purple>LDA</font>
+### LDA
 
 LDA的全称是Linear Discriminant Analysis(线性判别分析)，是一种supervised learning。有些资料上也称为是Fisher’s Linear Discriminant。LDA的原理是，将带上标签的数据(点)，通过投影的方法，投影到维度更低的空间中，使得投影后的点，会形成按类别区分，一簇一簇的情况，相同类别的点，将会在投影后的空间中更接近。
 
 我们首先来回顾一下线性分类器LDA：对于K-分类的一个分类问题，会有K个线性函数：
 
-![](https://latex.codecogs.com/svg.latex?y_k%20(x)=w_k^T%20x+w_{k0})
+![](https://latex.codecogs.com/svg.latex?y_k(x)=w_k^Tx+w_{k0})
 
 上式实际上就是一种投影，是将一个高维的点投影到一条高维的直线上，LDA最求的目标是，给出一个标注了类别的数据集，投影到了一条直线之后，能够使得点尽量的按类别区分开，当k=2即二分类问题的时候，如下图所示：
 
-![lda投影demo.gif](https://github.com/Canaan1216/FeatureManagement/image/LDA_touying_demo.gif)
+![lda投影demo.gif](https://github.com/Canaan1216/FeatureManagement/blob/main/image/LDA_touying_demo.gif)
 
-下面我们来推导一下**二分类LDA**问题的公式。假设用来区分二分类的直线(投影函数)为：
+下面我们来推导一下二分类LDA问题的公式。假设用来区分二分类的直线(投影函数)为：
 
-![](https://latex.codecogs.com/svg.latex?y=w^T%20x)
+![](https://latex.codecogs.com/svg.latex?y=w^Tx)
 
 LDA分类的目标是：使得不同类别之间的距离越远越好，同一类别之中的距离越近越好(投影后类内方差最小，类间方差最大)。
 
-![lda思想.png](https://github.com/Canaan1216/FeatureManagement/image/LDA_mind.png)
+![lda思想.png](https://github.com/Canaan1216/FeatureManagement/blob/main/image/LDA_mind.png)
 
 所以我们需要定义几个关键的值：
 
-- 类别i的原始中心点为(D~i~表示属于类别i的点)：
+- 类别i的原始中心点为(D<sub>i</sub>表示属于类别i的点)：
 
-```math
-m_i = \frac{1}{n_i}\sum_{x \in D_i}x
-```
+![](https://latex.codecogs.com/svg.latex?m_i=\frac{1}{n_i}\sum_{x\inD_i}x)
 
 - 类别i投影后的中心点为：
 
-```math
-\widetilde{m_i}=w^T m_i
-```
+![](https://latex.codecogs.com/svg.latex?\widetilde{m_i}=w^Tm_i)
 
 - 类别i投影后，类别点之间的方差为(我们认为投影之后y的值是不变的，比如1/0)：
 
-```math
-\widetilde{s_i}=\sum_{y \in Y_i}(y-\widetilde{m_i})^2
-```
+![](https://latex.codecogs.com/svg.latex?\widetilde{s_i}=\sum_{y\inY_i}(y-\widetilde{m_i})^2)
+
 最终我们可以得到一个下面的公式，表示LDA投影到w后的损失函数(因为我们这里考虑的是二分类LDA，所以只有2个类别项)：
 
-```math
-J(w)=\frac{|\widetilde{m_1}-\widetilde{m_2}|^2}{\widetilde{s_1}^2 + \widetilde{s_2}^2}
-```
+![](https://latex.codecogs.com/svg.latex?J(w)=\frac{|\widetilde{m_1}-\widetilde{m_2}|^2}{\widetilde{s_1}^2+\widetilde{s_2}^2})
 
 分母表示每一个类别内的方差之和，分子表示两个类别中心点之间的距离平方，我们最大化J(w)就可以求出最优的w了。
 
 现在J(w)公式里，w是不能被单独提出来的，我们需要想办法先将w单独提出来。
 
-我们定义一个投影前的各类别分散程度的矩阵：如果某一个分类的点距离这个分类的中心点m~i~越近，则S~i~里面元素的值就越小；如果分类的点都紧紧地围绕着m~i~，则S~i~里面的元素值越更接近0。
+我们定义一个投影前的各类别分散程度的矩阵：如果某一个分类的点距离这个分类的中心点m<sub>i</sub>越近，则S<sub>i</sub>里面元素的值就越小；如果分类的点都紧紧地围绕着m<sub>i</sub>，则S<sub>i</sub>里面的元素值越更接近0。
 
-```math
-S_i =\sum_{x \in D_i}(x-m_i)(x-m_i)^T
-```
+![](https://latex.codecogs.com/svg.latex?S_i=\sum_{x\inD_i}(x-m_i)(x-m_i)^T)
 
 那么J(w)的分母可以化为：
 
-```math
-\widetilde{s_i}=\sum_{x \in D_i}(w^T x- w^T m_i)^2=\sum_{x \in D_i}w^T(x-m_i)(x-m_i)^T w = w^T S_i w
+![](https://latex.codecogs.com/svg.latex?\widetilde{s_i}=\sum_{x\inD_i}(w^Tx-w^Tm_i)^2=\sum_{x\inD_i}w^T(x-m_i)(x-m_i)^Tw=w^TS_iw)
 
-\widetilde{s_1}^2 + \widetilde{s_2}^2 = w^T (S_1 + S_2) w = w^T S_w w
-```
+![](https://latex.codecogs.com/svg.latex?\widetilde{s_1}^2+\widetilde{s_2}^2=w^T(S_1+S_2)w=w^TS_ww)
+
 同样，J(w)的分子可以化为：
 
-```math
-|\widetilde{m_1}-\widetilde{m_2}|^2 = w^T (m_1 - m_2)(m_1 - m_2)^T w = w^T S_B w
-```
+![](https://latex.codecogs.com/svg.latex?|\widetilde{m_1}-\widetilde{m_2}|^2=w^T(m_1-m_2)(m_1-m_2)^Tw=w^TS_Bw)
 
 这样，损失函数就可以化为如下的形式：
 
-```math
-J(w)=\frac{w^T S_B w}{w^T S_w w}
-```
+![](https://latex.codecogs.com/svg.latex?J(w)=\frac{w^TS_Bw}{w^TS_ww})
 
-因为如果分子、分母都可以取任意值的话，会使得解的个数有无穷多个，因此**我们将分母限制为长度为1**(拉格朗日乘子法技巧)，并作为拉格朗日乘子法的限制条件，带入得到：
+因为如果分子、分母都可以取任意值的话，会使得解的个数有无穷多个，因此我们将分母限制为长度为1(拉格朗日乘子法技巧)，并作为拉格朗日乘子法的限制条件，带入得到：
 
-![](https://latex.codecogs.com/svg.latex?c(w)=w^T%20S_B%20w-\lambda%20(w^T%20S_w%20w%20-1)%20\\%20\Rightarrow%20\frac{dc}{dw}=2S_B%20w%20-%202\lambda%20S_w%20w%20=0\Rightarrow%20S_B%20w%20=%20\lambda%20S_w%20w)
+![](https://latex.codecogs.com/svg.latex?c(w)=w^TS_Bw-\lambda(w^TS_ww-1)\\\Rightarrow\frac{dc}{dw}=2S_Bw-2\lambdaS_ww=0\RightarrowS_Bw=\lambdaS_ww)
 
-如此，便转化为一个求特征值的问题。第i大的特征值，便对应w~i~。
+如此，便转化为一个求特征值的问题。第i大的特征值，便对应w<sub>i</sub>。
 
-### <font color=purple>PCA</font>
+### PCA
 
-![pca1.png](https://github.com/Canaan1216/FeatureManagement/image/PCA1.png)
+![pca1.png](https://github.com/Canaan1216/FeatureManagement/blob/main/image/PCA1.png)
 
 以上图为例，数据点大部分都分布在x2方向上，在x1方向上的取值近似相同，那么对于有些问题就可以直接将x1坐标的数值去掉，只取x2坐标的值即可。但是有些情况不能直接这样取，例如：
 
-![pca2.png](https://github.com/Canaan1216/FeatureManagement/image/PCA2.png)
+![pca2.png](https://github.com/Canaan1216/FeatureManagement/blob/main/image/PCA2.png)
 
 上图的数据分布在x1和x2方向都比较均匀，任一去掉一个坐标的数值可能对结果都会有很大的影响。这个时候就是PCA展现作用的时候了。黑色坐标系是原始坐标系，红色坐表系是我们后面构建的坐标系，如果我们的坐标系是红色的，那么这个问题就和上图的问题一致了，我们只需要去掉y2坐标系的数据即可。
 
 假设我们有m个样本，每个样本有n维特征。现在我们要将特征维度降到k维，那么PCA的数学表达可以这样表示：
 
-![](https://latex.codecogs.com/svg.latex?Z_{m%20\times%20k}%20=%20f(X_{m%20\times%20n}),k%3Cn)
+![](https://latex.codecogs.com/svg.latex?Z_{m\timesk}=f(X_{m\timesn}),k%3Cn)
 
-在线性空间中，矩阵可以表示为一种映射，所以上面的问题可以转化为寻找这样一个==矩阵W== ，该矩阵可以实现上面的映射目的：
+在线性空间中，矩阵可以表示为一种映射，所以上面的问题可以转化为寻找这样一个矩阵W，该矩阵可以实现上面的映射目的：
 
-![](https://latex.codecogs.com/svg.latex?Z_{m%20\times%20k}%20=%20X_{m%20\times%20n}%20W_{n%20\times%20k})
+![](https://latex.codecogs.com/svg.latex?Z_{m\timesk}=X_{m\timesn}W_{n\timesk})
 
 在PCA中，数据从原来的坐标系转换到了新的坐标系。推导过程与LDA类似。
 
