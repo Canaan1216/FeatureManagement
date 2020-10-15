@@ -5,17 +5,30 @@ README
 * [特征工程概述](#特征工程概述)
 * [数据预处理](#数据预处理)
     * [无量纲化](#无量纲化)
+        * [标准化](#标准化)
+        * [区间缩放法](#区间缩放法)
+        * [L2归一化](#L2归一化)
     * [定量特征二值化](#定量特征二值化)
     * [定性特征哑变量化](#定性特征哑变量化)
 * [特征选择](#特征选择)
     * [为什么要做特征选择](#为什么要做特征选择)
+        * [特征不足的影响](#特征不足的影响)
+        * [特征冗余的影响](#特征冗余的影响)
     * [filter](#filter)
+        * [方差选择法](#方差选择法)
+        * [相关系数法](#相关系数法)
+        * [卡方检验](#卡方检验)
+        * [互信息法(MIC)](#互信息法(MIC))
     * [Wrapper](#Wrapper)
+        * [stability selection](#stability selection)
+        * [recursive feature elimination(RFE)](#recursive feature elimination(RFE))
     * [Embedded](#Embedded)
+        * [Coefficients as Feature Importance](#Coefficients as Feature Importance)
+        * [Decision Tree Feature Importance](#Decision Tree Feature Importance)
     * [相关方法总结](#相关方法总结)
 * [特征降维](#特征降维)
-    *[LDA](#LDA)
-    *[PCA](#PCA)
+    * [LDA](#LDA)
+    * [PCA](#PCA)
 
 
 ## 特征工程概述
@@ -38,6 +51,20 @@ README
 ![特征工程组成部分.jpg](http://note.youdao.com/yws/public/resource/a69eeab234449e2b06866beedcf87e25/WEBRESOURCEe72828e75806392c6c39f347099c4ef4?ynotemdtimestamp=1602750323502)
 
 其中特征处理是特征工程的核心部分。
+
+---
+
+* [特征工程概述](#特征工程概述)
+* [数据预处理](#数据预处理)
+    * [无量纲化](#无量纲化)
+        * [标准化](#标准化)
+        * [区间缩放法](#区间缩放法)
+        * [L2归一化](#L2归一化)
+    * [定量特征二值化](#定量特征二值化)
+    * [定性特征哑变量化](#定性特征哑变量化)
+* [特征选择](#特征选择)
+* [特征降维](#特征降维)
+
 
 ## 数据预处理
 
@@ -80,6 +107,28 @@ README
 例：对于province这一个字段，它共有34种可能的枚举取值："北京市"、"广东省"、"山东首"、...<br>
 
 我们可以将其dummy化，转为"是否北京市"、"是否广东省"、"是否山东省"等34个字段。
+
+---
+
+* [特征工程概述](#特征工程概述)
+* [数据预处理](#数据预处理)
+* [特征选择](#特征选择)
+    * [为什么要做特征选择](#为什么要做特征选择)
+        * [特征不足的影响](#特征不足的影响)
+        * [特征冗余的影响](#特征冗余的影响)
+    * [filter](#filter)
+        * [方差选择法](#方差选择法)
+        * [相关系数法](#相关系数法)
+        * [卡方检验](#卡方检验)
+        * [互信息法(MIC)](#互信息法(MIC))
+    * [Wrapper](#Wrapper)
+        * [stability selection](#stability selection)
+        * [recursive feature elimination(RFE)](#recursive feature elimination(RFE))
+    * [Embedded](#Embedded)
+        * [Coefficients as Feature Importance](#Coefficients as Feature Importance)
+        * [Decision Tree Feature Importance](#Decision Tree Feature Importance)
+    * [相关方法总结](#相关方法总结)
+* [特征降维](#特征降维)
 
 ## 特征选择
 
@@ -293,8 +342,8 @@ L2正则化会添加如下惩罚项到损失函数中：
 L2正则化倾向于使系数值平均分散。对于存在相关关系的特征，它们会得到相近的值。
 
 对于上面的例子，假如我们有两个相似的目标函数：
-- Y=1X<sub>1<\sub> + 1X<sub>2<\sub>
-- Y=2X<sub>1<\sub> + 0X<sub>2<\sub>
+- Y=X1+X2
+- Y=2X1
 
 如果用L1正则化，则惩罚项都是2α。但如果用L2正则化，则第一个模型的惩罚项是2α，第二个模型的惩罚项是4α。
 
@@ -386,7 +435,7 @@ Ridge model: 0.896 * X0 + 0.903 * X1 + 0.98 * X2
 
 数学公式角度解释：
 
-![](https://latex.codecogs.com/svg.latex?L1=|w_1|+|w_2|+...+|w_n|,\frac{\partial%20L_1}{\partial%20w_i}=sign(w_i)=1\;or\;-1)
+![](https://latex.codecogs.com/svg.latex?L1=|w_1|+|w_2|+...+|w_n|,\frac{\partial%20L_1}{\partial%20w_i}=sign(w_i)=1%20or%20-1)
 
 <br>
 
@@ -789,6 +838,17 @@ Ridge regression：
 
 Stability selection：
 - 这种方法能够兼顾数据可解释性与top特征提取。从示例中可以看到，它很好地识别了top头部特征(x<sub>1</sub>，x<sub>2</sub>，x<sub>4</sub>，x<sub>5</sub>)，同时它们的相关特征也得到了一个相对较高的分值；
+
+
+---
+
+* [特征工程概述](#特征工程概述)
+* [数据预处理](#数据预处理)
+* [特征选择](#特征选择)
+* [特征降维](#特征降维)
+    * [LDA](#LDA)
+    * [PCA](#PCA)
+
 
 ## 特征降维
 
