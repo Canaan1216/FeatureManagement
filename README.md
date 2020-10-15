@@ -5,35 +5,13 @@ README
 * [特征工程概述](#特征工程概述)
 * [数据预处理](#数据预处理)
     * [无量纲化](#无量纲化)
-        * [标准化](#标准化)
-        * [区间缩放法](#区间缩放法)
-        * [L2归一化](#L2归一化)
     * [定量特征二值化](#定量特征二值化)
     * [定性特征哑变量化](#定性特征哑变量化)
 * [特征选择](#特征选择)
     * [为什么要做特征选择](#为什么要做特征选择)
-        *[特征不足的影响](#特征不足的影响)
-        *[特征冗余的影响](#特征冗余的影响)
     * [filter](#filter)
-        *[方差选择法](#方差选择法)
-        *[相关系数法](#相关系数法)
-        *[卡方检验](#卡方检验)
-        *[互信息法(MIC)](#互信息法(MIC))
     * [Wrapper](#Wrapper)
-        *[stability selection](#stability selection)
-        *[recursive feature elimination(RFE)](#recursive feature elimination(RFE))
     * [Embedded](#Embedded)
-        *[Coefficients as Feature Importance](#Coefficients as Feature Importance)
-            *[Linear Regression Feature Importance](#Linear Regression Feature Importance)
-            *[Regularized models](#Regularized models)
-                *[L0范数](#L0范数)
-                *[L1 regularization/Lasso](#L1 regularization/Lasso)
-                *[L2 regularization/Ridge regression](#L2 regularization/Ridge regression)
-            *[Logistic Regression Feature Importance](#Logistic Regression Feature Importance)
-        *[Decision Tree Feature Importance](#Decision Tree Feature Importance)
-            *[CART Feature Importance](#CART Feature Importance)
-            *[Random Forest Feature Importance](#Random Forest Feature Importance)
-            *[XGBoost Feature Importance](#XGBoost Feature Importance)
     * [相关方法总结](#相关方法总结)
 * [特征降维](#特征降维)
     *[LDA](#LDA)
@@ -55,11 +33,11 @@ README
 
 特征工程，就是基于原有的维度特征X，创造新的特征X'。 基本的操作包括：衍生(升维)、筛选(降维)。
 
-![特征工程概览.jpg](https://github.com/Canaan1216/FeatureManagement/blob/main/image/pic1.png)
+![特征工程概览.jpg](./image/pic1.png)
 
 通过总结和归纳，通常认为特征工程包括以下方面：
 
-![特征工程组成部分.jpg](https://github.com/Canaan1216/FeatureManagement/blob/main/image/fm_component.jpg)
+![特征工程组成部分.jpg](image/fm_component.jpg)
 
 其中特征处理是特征工程的核心部分。
 
@@ -97,7 +75,7 @@ README
 
 定量特征二值化的核心在于设定一个阈值，大于阈值的赋值为1，小于等于阈值的赋值为0，公式表达如下：
 
-![](https://latex.codecogs.com/svg.latex?x%27=\left\{\begin{matrix}1,\;x%3Ethreshold\\0,\;x\leqthreshold\end{matrix}\right.)
+![](https://latex.codecogs.com/svg.latex?x%27=\left\{\begin{matrix}1,x%3Ethreshold\\%200,x\leq%20threshold\end{matrix}\right.)
 
 ### 定性特征哑编码化
 
@@ -163,14 +141,14 @@ README
 
 全称为：Mutual information and maximal information coefficient。经典的互信息也是评价定性自变量对定性因变量的相关性的，互信息计算公式如下：
 
-![](https://latex.codecogs.com/svg.latex?I(X;Y)=\sum_{x\inX}\sum_{y\inY}{p(x,y)log\frac{p(x,y)}{p(x)p(y)}})
+![](https://latex.codecogs.com/svg.latex?I(X;Y)=\sum_{x\in%20X}\sum_{y\in%20Y}{p(x,y)log\frac{p(x,y)}{p(x)p(y)}})
 
 为了处理定量数据，最大信息系数法被提出。<br>
 
 ### Wrapper
 
 #### stability selection
-稳定性选择法，是对基于L1正则方法的一种补充。基于L1正则方法的局限性在于：当面对一组关联的特征时，它往往只会选择其中的一项特征。为了减轻该影响，使用了随机化的技术，通过多次重新估计稀疏模型，用==特征被选择为重要的次数/总次数==来表征该特征最终的重要程度。
+稳定性选择法，是对基于L1正则方法的一种补充。基于L1正则方法的局限性在于：当面对一组关联的特征时，它往往只会选择其中的一项特征。为了减轻该影响，使用了随机化的技术，通过多次重新估计稀疏模型，用特征被选择为重要的次数/总次数来表征该特征最终的重要程度。
 
 稳定性选择是一种基于抽样和选择相结合的方法，评估的方法可以是回归、SVM等可引入正则项的算法，理想情况下，重要特征的得分会接近100%，而无用的特征得分会接近于0。
 
@@ -228,7 +206,7 @@ lr.fit(X, Y)
  
 # A helper method for pretty-printing linear models
 def pretty_print_linear(coefs, names = None, sort = False):
-    if names == None:
+    if names  None:
         names = ["X%s" % x for x in range(len(coefs))]
     lst = zip(coefs, names)
     if sort:
@@ -317,8 +295,8 @@ L2正则化会添加如下惩罚项到损失函数中：
 L2正则化倾向于使系数值平均分散。对于存在相关关系的特征，它们会得到相近的值。
 
 对于上面的例子，假如我们有两个相似的目标函数：
-- Y=1X<sub>1<\sub>+1X<sub>2<\sub>
-- Y=2X<sub>1<\sub>+0X<sub>2<\sub>
+- Y=1X<sub>1<\sub> + 1X<sub>2<\sub>
+- Y=2X<sub>1<\sub> + 0X<sub>2<\sub>
 
 如果用L1正则化，则惩罚项都是2α。但如果用L2正则化，则第一个模型的惩罚项是2α，第二个模型的惩罚项是4α。
 
@@ -343,7 +321,7 @@ for i in range(10):
     X = np.array([X1, X2, X3]).T
 
     def pretty_print_linear(coefs, names=None, sort=False):
-        if names == None:
+        if names  None:
             names = ["X%s" % x for x in range(len(coefs))]
         lst = zip(coefs, names)
         if sort:
@@ -524,7 +502,7 @@ pyplot.show()
 ```
 ![rf_classification_fi.png](https://github.com/Canaan1216/FeatureManagement/blob/main/image/RF_Classification_FI.png)
 
-==More examples：==
+More examples：
 
 1、Mean decrease impurity
 
@@ -551,7 +529,7 @@ print sorted(zip(map(lambda x: round(x, 4), rf.feature_importances_), names),
 ```
 # ---result：---
 Boston House Prices dataset
-===========================
+=
 
 Notes
 ------
@@ -686,7 +664,7 @@ pyplot.show()
 
 下面我们在同一个数据集上运行所有特征重要度评估方法，以比较各方法之间的异同。数据集来自[Friedman regression dataset](ftp://ftp.uic.edu/pub/depts/econ/hhstokes/e538/Friedman_mars_1991.pdf)，数据符合如下分布：
 
-![](https://latex.codecogs.com/svg.latex?y=10sin(\pix_1x_2)+20(x_3-0.5)^2+10x_4+5X_5+\epsilon)
+![](https://latex.codecogs.com/svg.latex?y=10sin(\pi%20x_1x_2)+20(x_3-0.5)^2+10x_4+5X_5+\epsilon)
 
 其中，x<sub>1</sub>到x<sub>5</sub>符合[0,1)均匀分布，ϵ是符合N(0,1)分布的标准正态偏差。与此同时，x<sub>6</sub>至x<sub>10</sub>是噪声变量，且与目标变量相互独立。
 
@@ -777,10 +755,10 @@ for name in names:
 
 Feature | LIN.CORR | LINEAR REG | LASSO | MIC | RF | RFE | RIDGE | STABILITY | MEAN
 ---|---|---|---|---|---|---|---|---|---
-x1 | 0.3 | ==1== | 0.79 | 0.39 | 0.18 | 1 | 0.77 | 0.61 | 0.63
+x1 | 0.3 | 1 | 0.79 | 0.39 | 0.18 | 1 | 0.77 | 0.61 | 0.63
 x2 | 0.44 | 0.56 | 0.83 | 0.61 | 0.24 | 1 | 0.75 | 0.7 | 0.64
 x3 | 0 | 0.5 | 0 | 0.34 | 0.01 | 1 | 0.05 | 0 | 0.24
-x4 | ==1== | 0.57 | ==1== | ==1== | 0.45 | 1 | ==1== | ==1== | ==0.88==
+x4 | 1 | 0.57 | 1 | 1 | 0.45 | 1 | 1 | 1 | 0.88
 x5 | 0.1 | 0.27 | 0.51 | 0.2 | 0.04 | 0.78 | 0.88 | 0.6 | 0.42
 x6 | 0 | 0.02 | 0 | 0 | 0 | 0.44 | 0.05 | 0 | 0.06
 x7 | 0.01 | 0 | 0 | 0.07 | 0 | 0 | 0.01 | 0 | 0.01
@@ -790,7 +768,7 @@ x10 | 0 | 0.01 | 0 | 0.04 | 0 | 0.33 | 0.01 | 0 | 0.05
 x11 | 0.29 | 0.6 | 0 | 0.43 | 0.14 | 1 | 0.59 | 0.39 | 0.43
 x12 | 0.44 | 0.14 | 0 | 0.71 | 0.12 | 0.67 | 0.68 | 0.42 | 0.4
 x13 | 0 | 0.48 | 0 | 0.23 | 0.01 | 0.89 | 0.02 | 0 | 0.2
-x14 | 0.99 | 0 | 0.16 | ==1== | ==1== | 0.22 | 0.95 | 0.53 | 0.61
+x14 | 0.99 | 0 | 0.16 | 1 | 1 | 0.22 | 0.95 | 0.53 | 0.61
 
 Linear correlation：
 - 由于每个feature都是单独评估的，所以x<sub>1</sub>、...、x<sub>4</sub>与x<sub>11</sub>、...、x<sub>14</sub>的分值是接近的；
@@ -820,7 +798,7 @@ Stability selection：
 
 常见的降维方法除了基于L1惩罚项的模型以外，另外还有主成分分析法(PCA)和线性判别分析(LDA)，线性判别分析本身也是一个分类模型。
 
-PCA和LDA有很多的相似点，其本质是要将原始的样本映射到维度更低的样本空间中，但是PCA和LDA的映射目标不一样：==PCA是为了让映射后的样本具有最大的发散性；而LDA是为了让映射后的样本有最好的分类性能==。所以说PCA是一种无监督的降维方法，而LDA是一种有监督的降维方法。
+PCA和LDA有很多的相似点，其本质是要将原始的样本映射到维度更低的样本空间中，但是PCA和LDA的映射目标不一样：PCA是为了让映射后的样本具有最大的发散性；而LDA是为了让映射后的样本有最好的分类性能。所以说PCA是一种无监督的降维方法，而LDA是一种有监督的降维方法。
 
 
 ### LDA
