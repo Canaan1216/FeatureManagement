@@ -16,6 +16,7 @@ README
 * [特征降维](#特征降维)
     * [LDA](#LDA)
     * [PCA](#PCA)
+* [reference](#reference)
 
 
 ## 特征工程概述
@@ -51,6 +52,7 @@ README
     * [定性特征哑变量化](#定性特征哑变量化)
 * [特征选择](#特征选择)
 * [特征降维](#特征降维)
+* [reference](#reference)
 
 
 ## 数据预处理
@@ -112,6 +114,7 @@ README
     * [Embedded](#Embedded)
     * [相关方法总结](#相关方法总结)
 * [特征降维](#特征降维)
+* [reference](#reference)
 
 ## 特征选择
 
@@ -199,7 +202,7 @@ feature importance有两种常用实现思路：
 > feature importance is calculated by looking at the splits of each tree.<br>
 The importance of the splitting variable is proportional to the improvement to the gini index given by that split and it is accumulated (for each variable) over all the trees in the forest.
 
-就是计算每棵树的每个划分特征在划分准则(gini或者entropy)上的提升，然后聚合所有树得到特征权重
+就是计算每棵树的每个划分特征在划分准则([gini或者entropy](http://note.youdao.com/s/Ti6dJKZC))上的提升，然后聚合所有树得到特征权重
 
 (2) mean decrease in accuracy:
 
@@ -438,6 +441,9 @@ Coefficient of the features in the decision function.
 
 coef_ is of shape (1, n_features) when the given problem is binary. In particular, when multi_class='multinomial', coef_ corresponds to outcome 1 (True) and -coef_ corresponds to outcome 0 (False).
 
+<details>
+<summary>LogisticRegression</summary>
+
 ```
 # logistic regression for feature importance
 from sklearn.datasets import make_classification
@@ -460,6 +466,8 @@ pyplot.show()
 ```
 
 ![logistic_regression_fi.png](http://note.youdao.com/yws/public/resource/a69eeab234449e2b06866beedcf87e25/WEBRESOURCEec025ccc284a9d84ff53cbcce33d46f6?ynotemdtimestamp=1602750323502)
+
+</details><br>
 
 #### Decision Tree Feature Importance
 
@@ -510,6 +518,9 @@ The values of this array sum to 1, unless all trees are single node trees consis
 
 The higher, the more important the feature. The importance of a feature is computed as the (normalized) total reduction of the criterion brought by that feature. It is also known as the Gini importance.
 
+<details>
+<summary>RandomForestClassifier</summary>
+
 ```
 # random forest for feature importance on a classification problem
 from sklearn.datasets import make_classification
@@ -531,6 +542,11 @@ pyplot.bar([x for x in range(len(importance))], importance)
 pyplot.show()
 ```
 ![rf_classification_fi.png](http://note.youdao.com/yws/public/resource/a69eeab234449e2b06866beedcf87e25/WEBRESOURCEfaef7341ecdf388dac089244973f86e4?ynotemdtimestamp=1602750323502)
+
+</details><br>
+
+<details>
+<summary>More examples</summary>
 
 More examples：
 
@@ -638,6 +654,8 @@ print sorted([(round(np.mean(score), 4), feat) for
 Features sorted by their score:
 [(0.7739, 'LSTAT'), (0.5568, 'RM'), (0.0899, 'DIS'), (0.0409, 'NOX'), (0.0377, 'CRIM'), (0.0198, 'PTRATIO'), (0.0163, 'TAX'), (0.0109, 'AGE'), (0.0053, 'B'), (0.0046, 'INDUS'), (0.0034, 'RAD'), (0.0006, 'CHAS'), (0.0001, 'ZN')]
 ```
+
+</details><br>
 
 
 ##### XGBoost Feature Importance
@@ -831,6 +849,7 @@ Stability selection：
 * [特征降维](#特征降维)
     * [LDA](#LDA)
     * [PCA](#PCA)
+* [reference](#reference)
 
 
 ## 特征降维
@@ -910,13 +929,11 @@ LDA分类的目标是：使得不同类别之间的距离越远越好，同一�
 
 ### PCA
 
-![pca1.png](http://note.youdao.com/yws/public/resource/a69eeab234449e2b06866beedcf87e25/WEBRESOURCEe3ee4e4736a16626a54aea95c6ee3477?ynotemdtimestamp=1602750323502)
+以图1为例，数据点大部分都分布在x2方向上，在x1方向上的取值近似相同，那么对于有些问题就可以直接将x1坐标的数值去掉，只取x2坐标的值即可。但是有些情况不能直接这样取，例如图2：
 
-以上图为例，数据点大部分都分布在x2方向上，在x1方向上的取值近似相同，那么对于有些问题就可以直接将x1坐标的数值去掉，只取x2坐标的值即可。但是有些情况不能直接这样取，例如：
+![pca.png](http://note.youdao.com/yws/public/resource/a69eeab234449e2b06866beedcf87e25/WEBRESOURCEca3068cef3ea19f171c96da8756c2c51?ynotemdtimestamp=1602775351163)
 
-![pca2.png](http://note.youdao.com/yws/public/resource/a69eeab234449e2b06866beedcf87e25/WEBRESOURCE169dc0ef03cc1d2b757b6db7ef24560a?ynotemdtimestamp=1602750323502)
-
-上图的数据分布在x1和x2方向都比较均匀，任一去掉一个坐标的数值可能对结果都会有很大的影响。这个时候就是PCA展现作用的时候了。黑色坐标系是原始坐标系，红色坐表系是我们后面构建的坐标系，如果我们的坐标系是红色的，那么这个问题就和上图的问题一致了，我们只需要去掉y2坐标系的数据即可。
+其数据分布在x1和x2方向都比较均匀，任一去掉一个坐标的数值可能对结果都会有很大的影响。这个时候就是PCA展现作用的时候了。黑色坐标系是原始坐标系，红色坐表系是我们后面构建的坐标系，如果我们的坐标系是红色的，那么这个问题就和上图的问题一致了，我们只需要去掉y2坐标系的数据即可。
 
 假设我们有m个样本，每个样本有n维特征。现在我们要将特征维度降到k维，那么PCA的数学表达可以这样表示：
 
@@ -930,4 +947,11 @@ LDA分类的目标是：使得不同类别之间的距离越远越好，同一�
 
 新坐标系的选择是由数据本身决定的。第一个新坐标轴选择的是原始数据中方差最大的方向，第二个新坐标轴的选择和第一个坐标轴正交且具有最大方差的方向。该过程一直重复，重复次数为原始数据中特征的数目。
 
-会发现，大部分方差都包含在最前面的几个新坐标轴维度中。因此我们可以只选择前面几个坐标轴，即对数据进行了降维处理。 
+会发现，大部分方差都包含在最前面的几个新坐标轴维度中。因此我们可以只选择前面几个坐标轴，即对数据进行了降维处理。
+
+## reference
+
+1. [How to Calculate Feature Importance With Python](https://machinelearningmastery.com/calculate-feature-importance-with-python/)
+1. [Selecting good features(Part I~IV)](https://blog.datadive.net/selecting-good-features-part-i-univariate-selection/)
+1. [特征工程到底是什么? - 知乎](https://www.zhihu.com/question/29316149?sort=created)
+1. [特征选择经典三刀](https://mp.weixin.qq.com/s?__biz=MzIzMDA1MTM3Mg==&mid=2653077415&idx=1&sn=5a036534000cb7566e78e0e315242fe2)
