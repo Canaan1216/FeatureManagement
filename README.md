@@ -27,17 +27,15 @@ README
 
 在这个例子中，一个非常经典的构造特征是BMI指数：
 
-![](https://latex.codecogs.com/svg.latex?BMI=\frac{weight}{height^2})
+BMI=体重/身高^2
 
 这样，通过BMI指数，就能帮助我们刻画一个人的身材如何。甚至我们可以丢弃原始的体重和身高数据。
 
 特征工程，就是基于原有的维度特征X，创造新的特征X'。 基本的操作包括：衍生(升维)、筛选(降维)。
 
-![特征工程概览.jpg](./image/pic1.png)
-
 通过总结和归纳，通常认为特征工程包括以下方面：
 
-![特征工程组成部分.jpg](image/fm_component.jpg)
+![特征工程组成部分.jpg](http://note.youdao.com/yws/public/resource/a69eeab234449e2b06866beedcf87e25/WEBRESOURCEe72828e75806392c6c39f347099c4ef4?ynotemdtimestamp=1602750323502)
 
 其中特征处理是特征工程的核心部分。
 
@@ -91,19 +89,19 @@ README
 
 一般说来，当固定一个分类器的话，所选择的特征数量和分类器的效果之间会满足如下曲线：特征数据在等于某个x(1≤x≤n)时达到最优。过多或过少都会使分类器的效果发生下降。
 
-![特征数量与模型效果的关系.jpeg](https://github.com/Canaan1216/FeatureManagement/blob/main/image/feature_cnt_result.jpeg)
+![特征数量与模型效果的关系.jpeg](http://note.youdao.com/yws/public/resource/a69eeab234449e2b06866beedcf87e25/WEBRESOURCE980cd4af2c051fc17ece248342dcbcee?ynotemdtimestamp=1602750323502)
 
 #### 特征不足的影响
 
 当特征不足时，极易发生数据重叠，这种情况下任何分类器都会失效。如下图所示，仅依赖X<sub>1</sub>或X<sub>2</sub>都是无法区分这两类数据的。
 
-![特征过少.png](https://github.com/Canaan1216/FeatureManagement/blob/main/image/too_little_features.png)
+![特征过少.png](http://note.youdao.com/yws/public/resource/a69eeab234449e2b06866beedcf87e25/WEBRESOURCE2e3f2caecd917074fcd04cd31eb42526?ynotemdtimestamp=1602750323502)
 
 #### 特征冗余的影响
 
 增加特征可以理解为向高维空间映射，当这个“维度”过高时，容易造成同类数据在空间中的距离边远，变稀疏，这也易使得很多分类算法失效。如下图所示，仅依赖x轴本可划分特征，但y轴的引入使得同一类别不再聚集。
 
-![特征过多.png](https://github.com/Canaan1216/FeatureManagement/blob/main/image/too_much_features.png)
+![特征过多.png](http://note.youdao.com/yws/public/resource/a69eeab234449e2b06866beedcf87e25/WEBRESOURCE36ea83192d29f7ca9b21bcd5c063af5c?ynotemdtimestamp=1602750323502)
 
 
 通常来说，我们从两个方面考虑来选择特征：
@@ -388,11 +386,11 @@ Ridge model: 0.896 * X0 + 0.903 * X1 + 0.98 * X2
 
 数学公式角度解释：
 
-![](https://latex.codecogs.com/svg.latex?L1=|w_1|+|w_1|+...+|w_n|,\frac{\partialL_1}{\partialw_i}=sign(w_i)=1\;or\;-1)
+![](https://latex.codecogs.com/svg.latex?L1=|w_1|+|w_2|+...+|w_n|,\frac{\partial%20L_1}{\partial%20w_i}=sign(w_i)=1\;or\;-1)
 
 <br>
 
-![](https://latex.codecogs.com/svg.latex?L2=\frac{1}{2}(w_1^2+w_2^2+...+w_n^2),\frac{\partialL_2}{\partialw_i}=w_i)
+![](https://latex.codecogs.com/svg.latex?L2=\frac{1}{2}(w_1^2+w_2^2+...+w_n^2),\frac{\partial%20L_2}{\partial%20w_i}=w_i)
 
 我们假设学习速率η为0.5：
 - L1的权值更新公式，每次更新都固定减少一个特定值，那么经过若干次迭代之后，权值就有可能减少到0；
@@ -429,7 +427,7 @@ pyplot.bar([x for x in range(len(importance))], importance)
 pyplot.show()
 ```
 
-![logistic_regression_fi.png](https://github.com/Canaan1216/FeatureManagement/blob/main/image/Linear_Regression_FI.png)
+![logistic_regression_fi.png](http://note.youdao.com/yws/public/resource/a69eeab234449e2b06866beedcf87e25/WEBRESOURCEec025ccc284a9d84ff53cbcce33d46f6?ynotemdtimestamp=1602750323502)
 
 #### Decision Tree Feature Importance
 
@@ -471,7 +469,7 @@ pyplot.bar([x for x in range(len(importance))], importance)
 pyplot.show()
 ```
 
-![rf_regression_fi.png](https://github.com/Canaan1216/FeatureManagement/blob/main/image/RF_Regression_FI.png)
+![rf_regression_fi.png](http://note.youdao.com/yws/public/resource/a69eeab234449e2b06866beedcf87e25/WEBRESOURCE31d1432c2e068040a796e25aba142a2c?ynotemdtimestamp=1602750323502)
 
 Random Forest分类模型特征重要度
 
@@ -500,7 +498,7 @@ for i,v in enumerate(importance):
 pyplot.bar([x for x in range(len(importance))], importance)
 pyplot.show()
 ```
-![rf_classification_fi.png](https://github.com/Canaan1216/FeatureManagement/blob/main/image/RF_Classification_FI.png)
+![rf_classification_fi.png](http://note.youdao.com/yws/public/resource/a69eeab234449e2b06866beedcf87e25/WEBRESOURCEfaef7341ecdf388dac089244973f86e4?ynotemdtimestamp=1602750323502)
 
 More examples：
 
@@ -811,7 +809,7 @@ LDA的全称是Linear Discriminant Analysis(线性判别分析)，是一种super
 
 上式实际上就是一种投影，是将一个高维的点投影到一条高维的直线上，LDA最求的目标是，给出一个标注了类别的数据集，投影到了一条直线之后，能够使得点尽量的按类别区分开，当k=2即二分类问题的时候，如下图所示：
 
-![lda投影demo.gif](https://github.com/Canaan1216/FeatureManagement/blob/main/image/LDA_touying_demo.gif)
+![lda投影demo.gif](http://note.youdao.com/yws/public/resource/a69eeab234449e2b06866beedcf87e25/WEBRESOURCE0b1fdf580abe09b153b24865496a66ae?ynotemdtimestamp=1602750323502)
 
 下面我们来推导一下二分类LDA问题的公式。假设用来区分二分类的直线(投影函数)为：
 
@@ -819,13 +817,13 @@ LDA的全称是Linear Discriminant Analysis(线性判别分析)，是一种super
 
 LDA分类的目标是：使得不同类别之间的距离越远越好，同一类别之中的距离越近越好(投影后类内方差最小，类间方差最大)。
 
-![lda思想.png](https://github.com/Canaan1216/FeatureManagement/blob/main/image/LDA_mind.png)
+![lda思想.png](http://note.youdao.com/yws/public/resource/a69eeab234449e2b06866beedcf87e25/WEBRESOURCEed9476135a816a68956bfd8faca3a0f0?ynotemdtimestamp=1602750323502)
 
 所以我们需要定义几个关键的值：
 
 - 类别i的原始中心点为(D<sub>i</sub>表示属于类别i的点)：
 
-![](https://latex.codecogs.com/svg.latex?m_i=\frac{1}{n_i}\sum_{x\inD_i}x)
+![](https://latex.codecogs.com/svg.latex?m_i=\frac{1}{n_i}\sum_{x\in%20D_i}x)
 
 - 类别i投影后的中心点为：
 
@@ -833,7 +831,7 @@ LDA分类的目标是：使得不同类别之间的距离越远越好，同一�
 
 - 类别i投影后，类别点之间的方差为(我们认为投影之后y的值是不变的，比如1/0)：
 
-![](https://latex.codecogs.com/svg.latex?\widetilde{s_i}=\sum_{y\inY_i}(y-\widetilde{m_i})^2)
+![](https://latex.codecogs.com/svg.latex?\widetilde{s_i}=\sum_{y\in%20Y_i}(y-\widetilde{m_i})^2)
 
 最终我们可以得到一个下面的公式，表示LDA投影到w后的损失函数(因为我们这里考虑的是二分类LDA，所以只有2个类别项)：
 
@@ -845,11 +843,11 @@ LDA分类的目标是：使得不同类别之间的距离越远越好，同一�
 
 我们定义一个投影前的各类别分散程度的矩阵：如果某一个分类的点距离这个分类的中心点m<sub>i</sub>越近，则S<sub>i</sub>里面元素的值就越小；如果分类的点都紧紧地围绕着m<sub>i</sub>，则S<sub>i</sub>里面的元素值越更接近0。
 
-![](https://latex.codecogs.com/svg.latex?S_i=\sum_{x\inD_i}(x-m_i)(x-m_i)^T)
+![](https://latex.codecogs.com/svg.latex?S_i=\sum_{x\in%20D_i}(x-m_i)(x-m_i)^T)
 
 那么J(w)的分母可以化为：
 
-![](https://latex.codecogs.com/svg.latex?\widetilde{s_i}=\sum_{x\inD_i}(w^Tx-w^Tm_i)^2=\sum_{x\inD_i}w^T(x-m_i)(x-m_i)^Tw=w^TS_iw)
+![](https://latex.codecogs.com/svg.latex?\widetilde{s_i}=\sum_{x\in%20D_i}(w^Tx-w^Tm_i)^2=\sum_{x\in%20D_i}w^T(x-m_i)(x-m_i)^Tw=w^TS_iw)
 
 ![](https://latex.codecogs.com/svg.latex?\widetilde{s_1}^2+\widetilde{s_2}^2=w^T(S_1+S_2)w=w^TS_ww)
 
@@ -863,27 +861,27 @@ LDA分类的目标是：使得不同类别之间的距离越远越好，同一�
 
 因为如果分子、分母都可以取任意值的话，会使得解的个数有无穷多个，因此我们将分母限制为长度为1(拉格朗日乘子法技巧)，并作为拉格朗日乘子法的限制条件，带入得到：
 
-![](https://latex.codecogs.com/svg.latex?c(w)=w^TS_Bw-\lambda(w^TS_ww-1)\\\Rightarrow\frac{dc}{dw}=2S_Bw-2\lambdaS_ww=0\RightarrowS_Bw=\lambdaS_ww)
+![](https://latex.codecogs.com/svg.latex?c(w)=w^TS_Bw-\lambda(w^TS_ww-1)\\\Rightarrow%20\frac{dc}{dw}=2S_Bw-2\lambda%20S_ww=0\Rightarrow%20S_Bw=\lambda%20S_ww)
 
 如此，便转化为一个求特征值的问题。第i大的特征值，便对应w<sub>i</sub>。
 
 ### PCA
 
-![pca1.png](https://github.com/Canaan1216/FeatureManagement/blob/main/image/PCA1.png)
+![pca1.png](http://note.youdao.com/yws/public/resource/a69eeab234449e2b06866beedcf87e25/WEBRESOURCEe3ee4e4736a16626a54aea95c6ee3477?ynotemdtimestamp=1602750323502)
 
 以上图为例，数据点大部分都分布在x2方向上，在x1方向上的取值近似相同，那么对于有些问题就可以直接将x1坐标的数值去掉，只取x2坐标的值即可。但是有些情况不能直接这样取，例如：
 
-![pca2.png](https://github.com/Canaan1216/FeatureManagement/blob/main/image/PCA2.png)
+![pca2.png](http://note.youdao.com/yws/public/resource/a69eeab234449e2b06866beedcf87e25/WEBRESOURCE169dc0ef03cc1d2b757b6db7ef24560a?ynotemdtimestamp=1602750323502)
 
 上图的数据分布在x1和x2方向都比较均匀，任一去掉一个坐标的数值可能对结果都会有很大的影响。这个时候就是PCA展现作用的时候了。黑色坐标系是原始坐标系，红色坐表系是我们后面构建的坐标系，如果我们的坐标系是红色的，那么这个问题就和上图的问题一致了，我们只需要去掉y2坐标系的数据即可。
 
 假设我们有m个样本，每个样本有n维特征。现在我们要将特征维度降到k维，那么PCA的数学表达可以这样表示：
 
-![](https://latex.codecogs.com/svg.latex?Z_{m\timesk}=f(X_{m\timesn}),k%3Cn)
+![](https://latex.codecogs.com/svg.latex?Z_{m\times%20k}=f(X_{m\times%20n}),k%3Cn)
 
 在线性空间中，矩阵可以表示为一种映射，所以上面的问题可以转化为寻找这样一个矩阵W，该矩阵可以实现上面的映射目的：
 
-![](https://latex.codecogs.com/svg.latex?Z_{m\timesk}=X_{m\timesn}W_{n\timesk})
+![](https://latex.codecogs.com/svg.latex?Z_{m\times%20k}=X_{m\times%20n}W_{n\times%20k})
 
 在PCA中，数据从原来的坐标系转换到了新的坐标系。推导过程与LDA类似。
 
